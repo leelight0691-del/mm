@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>2026 전교생 마니또</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Pen+Script&family=Jua&display=swap');
+:root {
+  --primary:#ff6b6b;--secondary:#ffd93d;--accent:#6bcb77;--blue:#4d96ff;--purple:#c77dff;
+  --bg:#fff9f0;--card:#ffffff;--text:#2d2d2d;--muted:#888;--border:#ffe0cc;
+  --shadow:0 4px 24px rgba(255,107,107,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Gowun Dodum',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,#ff6b6b 0%,#ffd93d 50%,#6bcb77 100%);padding:28px 20px 20px;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(255,255,255,0.07) 10px,rgba(255,255,255,0.07) 20px);}
+.header h1{font-family:'Jua',sans-serif;font-size:2rem;color:#fff;text-shadow:2px 3px 0 rgba(0,0,0,0.15);position:relative;}
+.header p{color:rgba(255,255,255,0.92);font-size:0.95rem;margin-top:4px;position:relative;}
+.mode-select{display:flex;gap:16px;justify-content:center;padding:28px 20px 10px;flex-wrap:wrap;}
+.mode-btn{background:var(--card);border:3px solid var(--border);border-radius:20px;padding:22px 36px;cursor:pointer;font-family:'Jua',sans-serif;font-size:1.2rem;color:var(--text);transition:all .22s;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:8px;min-width:160px;}
+.mode-btn .icon{font-size:2.2rem;line-height:1;}
+.mode-btn:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(255,107,107,0.18);}
+.mode-btn.teacher{border-color:var(--primary);}
+.mode-btn.student{border-color:var(--blue);}
+.container{max-width:860px;margin:0 auto;padding:10px 16px 60px;}
+.panel{background:var(--card);border-radius:20px;padding:28px;margin-top:18px;box-shadow:var(--shadow);border:2px solid var(--border);}
+.panel h2{font-family:'Jua',sans-serif;font-size:1.4rem;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.tabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;}
+.tab{padding:9px 20px;border-radius:50px;border:2px solid var(--border);background:transparent;cursor:pointer;font-family:'Gowun Dodum',sans-serif;font-size:0.95rem;transition:all .18s;color:var(--muted);}
+.tab.active{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:bold;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+textarea,input[type=text],input[type=password]{width:100%;border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Gowun Dodum',sans-serif;font-size:1rem;background:#fffdf8;color:var(--text);outline:none;transition:border .18s;resize:vertical;}
+textarea:focus,input[type=text]:focus,input[type=password]:focus{border-color:var(--primary);}
+.btn{display:inline-block;padding:11px 26px;border-radius:50px;border:none;cursor:pointer;font-family:'Jua',sans-serif;font-size:1rem;transition:all .18s;margin-top:10px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:#e05555;transform:translateY(-2px);}
+.btn-secondary{background:var(--secondary);color:#555;}
+.btn-secondary:hover{background:#e6c200;transform:translateY(-2px);}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-accent:hover{background:#4db85f;transform:translateY(-2px);}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-blue:hover{background:#2d7ae0;transform:translateY(-2px);}
+.btn-sm{padding:7px 18px;font-size:0.88rem;}
+.student-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:14px;max-height:400px;overflow-y:auto;padding:4px;}
+.student-chip{padding:10px 8px;border-radius:12px;border:2px solid var(--border);text-align:center;cursor:pointer;font-size:0.95rem;transition:all .15s;background:#fffdf8;word-break:keep-all;}
+.student-chip:hover{border-color:var(--blue);background:#eef5ff;}
+.student-chip.selected{border-color:var(--blue);background:var(--blue);color:#fff;font-weight:bold;}
+.student-chip.assigned{border-color:var(--accent);background:#efffef;}
+.student-chip.assigned.selected{background:var(--blue);color:#fff;}
+.manitto-box{background:linear-gradient(135deg,#fff0f0,#fff8e0);border:2px dashed var(--primary);border-radius:16px;padding:28px;text-align:center;margin-top:16px;}
+.manitto-name{font-family:'Nanum Pen Script',cursive;font-size:2.8rem;color:var(--primary);margin-top:8px;}
+.envelope-btn{background:linear-gradient(135deg,#ff6b6b,#ffd93d);color:#fff;border:none;border-radius:50px;padding:14px 36px;font-family:'Jua',sans-serif;font-size:1.1rem;cursor:pointer;margin-top:8px;box-shadow:0 4px 18px rgba(255,107,107,0.3);transition:all .22s;animation:pulse 2s infinite;}
+.envelope-btn:hover{transform:scale(1.06);}
+@keyframes pulse{0%,100%{box-shadow:0 4px 18px rgba(255,107,107,0.3);}50%{box-shadow:0 6px 28px rgba(255,107,107,0.55);}}
+.mission-days{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px;}
+.mission-day-input{display:flex;flex-direction:column;gap:6px;}
+.mission-day-input label{font-family:'Jua',sans-serif;font-size:1rem;}
+.mission-list{display:flex;flex-direction:column;gap:12px;margin-top:14px;}
+.mission-item{display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:14px;border:2px solid var(--border);cursor:pointer;transition:all .18s;background:#fffdf8;}
+.mission-item:hover{border-color:var(--accent);background:#f5fff6;}
+.mission-item.done{border-color:var(--accent);background:linear-gradient(90deg,#f0fff2,#fffdf8);}
+.mission-item .check-circle{width:32px;height:32px;border-radius:50%;border:2.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;transition:all .18s;}
+.mission-item.done .check-circle{background:var(--accent);border-color:var(--accent);color:#fff;}
+.mission-day-tag{font-family:'Jua',sans-serif;font-size:0.78rem;padding:3px 10px;border-radius:50px;background:var(--secondary);color:#555;flex-shrink:0;}
+.mission-item.done .mission-day-tag{background:var(--accent);color:#fff;}
+.mission-text{font-size:0.98rem;line-height:1.5;flex:1;}
+.mission-item.today{border-color:var(--blue);background:#f0f6ff;}
+.mission-item.today .mission-day-tag{background:var(--blue);color:#fff;}
+.status-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:0.9rem;}
+.status-table th{background:var(--primary);color:#fff;padding:10px 8px;font-family:'Jua',sans-serif;}
+.status-table td{padding:9px 8px;border-bottom:1px solid #ffe8d6;text-align:center;}
+.status-table tr:nth-child(even) td{background:#fffaf5;}
+.check-y{color:var(--accent);font-weight:bold;}
+.check-n{color:#ddd;}
+.stat-bar{background:#ffe8d6;border-radius:50px;height:8px;margin-top:4px;overflow:hidden;}
+.stat-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:50px;transition:width .4s;}
+.notice{background:#fff3cd;border:1px solid #ffc107;border-radius:12px;padding:12px 16px;font-size:0.9rem;color:#856404;margin-top:12px;line-height:1.6;}
+.badge{display:inline-block;padding:3px 12px;border-radius:50px;font-size:0.82rem;font-family:'Jua',sans-serif;}
+.badge-red{background:#ffe0e0;color:var(--primary);}
+.badge-green{background:#dcf5e0;color:#2e7d32;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px;}
+.modal{background:var(--card);border-radius:24px;padding:36px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,0.18);}
+.modal h3{font-family:'Jua',sans-serif;font-size:1.4rem;margin-bottom:16px;color:var(--primary);}
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:2px solid var(--border);border-radius:50px;padding:7px 18px;cursor:pointer;font-family:'Gowun Dodum',sans-serif;font-size:0.92rem;color:var(--muted);margin-bottom:12px;transition:all .15s;}
+.back-btn:hover{border-color:var(--primary);color:var(--primary);}
+.hidden{display:none!important;}
+.section-title{font-family:'Jua',sans-serif;font-size:1.05rem;color:var(--muted);margin-bottom:10px;}
+.manitto-hidden-msg{font-size:1rem;color:var(--muted);margin-bottom:12px;line-height:1.6;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#ffd0b5;border-radius:3px;}
+.progress-wrap{margin-top:16px;}
+.progress-label{display:flex;justify-content:space-between;font-size:0.88rem;color:var(--muted);margin-bottom:4px;}
+.progress-bar{background:#ffe8d6;border-radius:50px;height:12px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));border-radius:50px;transition:width .5s ease;}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,249,240,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:12px;}
+.loading-spinner{width:40px;height:40px;border:4px solid #ffe0cc;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.sync-indicator{position:fixed;bottom:16px;right:16px;background:var(--card);border:2px solid var(--border);border-radius:50px;padding:8px 16px;font-size:0.82rem;font-family:'Gowun Dodum',sans-serif;color:var(--muted);display:flex;align-items:center;gap:6px;box-shadow:var(--shadow);z-index:100;}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#ddd;transition:background .3s;}
+.sync-dot.syncing{background:var(--secondary);animation:blink 1s infinite;}
+.sync-dot.ok{background:var(--accent);}
+.sync-dot.error{background:var(--primary);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+@media(max-width:500px){.header h1{font-size:1.5rem;}.panel{padding:18px;}.mission-days{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- 로딩 -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-spinner"></div>
+  <p style="font-family:'Jua',sans-serif;color:var(--primary);font-size:1.1rem;">데이터 불러오는 중...</p>
+</div>
+
+<!-- 교사 비밀번호 모달 -->
+<div id="pwModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h3>교사 인증</h3>
+    <p style="color:var(--muted);font-size:.95rem;margin-bottom:16px;">교사 전용 페이지입니다.<br>비밀번호를 입력해주세요.</p>
+    <input type="password" id="pwInput" placeholder="비밀번호 입력" style="text-align:center;font-size:1.1rem;" onkeydown="if(event.key==='Enter')checkPw()"/>
+    <div id="pwError" style="color:var(--primary);font-size:.88rem;margin-top:8px;display:none;">비밀번호가 틀렸습니다.</div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
+      <button class="btn btn-primary" onclick="checkPw()">확인</button>
+      <button class="btn btn-secondary" onclick="closePwModal()">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 헤더 -->
+<div class="header">
+  <h1>🎉 2026 전교생 마니또</h1>
+  <p>함께 만드는 따뜻한 일주일 ✨</p>
+</div>
+
+<div class="container">
+  <!-- 모드 선택 -->
+  <div id="modeSelect" class="mode-select">
+    <button class="mode-btn teacher" onclick="openTeacher()">
+      <span class="icon">👩‍🏫</span>교사
+    </button>
+    <button class="mode-btn student" onclick="openStudent()">
+      <span class="icon">🎒</span>학생
+    </button>
+  </div>
+
+  <!-- 교사 패널 -->
+  <div id="teacherPanel" class="hidden">
+    <button class="back-btn" onclick="goHome()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      처음으로
+    </button>
+    <div class="panel">
+      <h2>🏫 교사 관리 페이지</h2>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('roster',this)">명단 &amp; 배정</button>
+        <button class="tab" onclick="switchTab('mission',this)">미션 입력</button>
+        <button class="tab" onclick="switchTab('status',this)">달성 현황</button>
+      </div>
+
+      <!-- 탭: 명단 -->
+      <div id="tab-roster" class="tab-content active">
+        <p class="section-title">학생 이름을 한 줄에 한 명씩 입력하세요 (총 86명 권장)</p>
+        <textarea id="rosterInput" rows="14" placeholder="홍길동&#10;김철수&#10;이영희&#10;..."></textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="saveRoster()">명단 저장</button>
+          <button class="btn btn-accent" onclick="assignManitto()">마니또 무작위 배정</button>
+          <button class="btn btn-secondary btn-sm" style="margin-top:10px;" onclick="resetManitto()">마니또 초기화</button>
+        </div>
+        <div id="rosterStatus" style="margin-top:12px;font-size:.92rem;color:var(--muted);"></div>
+        <div class="notice">
+          - 명단 저장 후 "마니또 무작위 배정"을 눌러야 배정이 됩니다.<br>
+          - 배정 후에는 학생들이 각자 기기에서 마니또를 확인할 수 있습니다.<br>
+          - 한번 배정된 마니또는 초기화 버튼을 누르지 않는 한 유지됩니다.
+        </div>
+      </div>
+
+      <!-- 탭: 미션 -->
+      <div id="tab-mission" class="tab-content">
+        <p class="section-title">요일별 미션을 입력하세요</p>
+        <div class="mission-days">
+          <div class="mission-day-input"><label style="color:#e74c3c;">월요일</label><textarea id="mission-mon" rows="3" placeholder="월요일 미션..."></textarea></div>
+          <div class="mission-day-input"><label style="color:#e67e22;">화요일</label><textarea id="mission-tue" rows="3" placeholder="화요일 미션..."></textarea></div>
+          <div class="mission-day-input"><label style="color:#27ae60;">수요일</label><textarea id="mission-wed" rows="3" placeholder="수요일 미션..."></textarea></div>
+          <div class="mission-day-input"><label style="color:#2980b9;">목요일</label><textarea id="mission-thu" rows="3" placeholder="목요일 미션..."></textarea></div>
+          <div class="mission-day-input"><label style="color:#8e44ad;">금요일</label><textarea id="mission-fri" rows="3" placeholder="금요일 미션..."></textarea></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveMissions()">미션 저장</button>
+        <div id="missionStatus" style="margin-top:10px;font-size:.92rem;color:var(--muted);"></div>
+      </div>
+
+      <!-- 탭: 현황 -->
+      <div id="tab-status" class="tab-content">
+        <div id="statusContent"><p style="color:var(--muted);font-size:.95rem;">학생 명단을 먼저 입력해주세요.</p></div>
+        <button class="btn btn-secondary btn-sm" style="margin-top:14px;" onclick="renderStatus()">새로고침</button>
+        <button class="btn btn-sm" style="background:#ffe0e0;color:var(--primary);margin-top:10px;border:none;cursor:pointer;border-radius:50px;padding:7px 18px;" onclick="resetAllProgress()">전체 달성 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 학생 패널 -->
+  <div id="studentPanel" class="hidden">
+    <button class="back-btn" onclick="goHome()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      처음으로
+    </button>
+
+    <!-- 이름 선택 -->
+    <div id="nameSelectSection" class="panel">
+      <h2>
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="7" fill="#4d96ff"/><circle cx="11" cy="9" r="3.5" fill="white" fill-opacity=".95"/><path d="M4 20c0-3.9 3.1-6 7-6s7 2.1 7 6" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        내 이름 선택하기
+      </h2>
+      <p class="section-title">아래에서 본인 이름을 클릭하고 "선택 완료"를 눌러주세요</p>
+      <div id="nameGrid" class="student-grid"></div>
+      <div id="selectedNameDisplay" style="margin-top:14px;font-size:1rem;color:var(--muted);"></div>
+      <button class="btn btn-blue" style="margin-top:6px;" onclick="confirmStudent()">선택 완료</button>
+      <div class="notice" style="margin-top:14px;">
+        - 이름을 한 번만 선택하면 이후 같은 기기에서 자동으로 연결됩니다.<br>
+        - 같은 기기를 여러 학생이 사용하지 않도록 주의해주세요.
+      </div>
+    </div>
+
+    <!-- 학생 메인 -->
+    <div id="studentMain" class="hidden">
+      <div class="panel">
+        <h2 id="studentGreeting"></h2>
+        <div class="manitto-box">
+          <div id="manittoRevealArea">
+            <p class="manitto-hidden-msg">나의 마니또가 누구인지 궁금하지 않나요?<br>아래 버튼을 눌러 확인해보세요!</p>
+            <button class="envelope-btn" onclick="revealManitto()">마니또 공개하기</button>
+          </div>
+          <div id="manittoShown" class="hidden">
+            <p style="font-size:.95rem;color:var(--muted);margin-bottom:4px;">나의 마니또는...</p>
+            <div class="manitto-name" id="manittoNameDisplay"></div>
+            <p style="font-size:.88rem;color:var(--muted);margin-top:10px;">마니또를 위해 오늘도 따뜻한 하루 만들어주세요!</p>
+          </div>
+        </div>
+        <div style="margin-top:24px;">
+          <h3 style="font-family:'Jua',sans-serif;font-size:1.1rem;margin-bottom:4px;">이번 주 미션</h3>
+          <p style="font-size:.88rem;color:var(--muted);margin-bottom:2px;">미션을 달성했으면 클릭해서 체크해주세요!</p>
+          <div id="studentMissionList" class="mission-list"></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>나의 달성률</span><span id="progressLabel">0 / 5</span></div>
+          <div class="progress-bar"><div class="progress-bar-fill" id="progressBarFill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 동기화 상태 -->
+<div class="sync-indicator" id="syncIndicator">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncText">연결 중...</span>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCF9-WicP8gztfctlvN_3T1wfAhWKX_4TY",
+  authDomain: "manitto-4cc63.firebaseapp.com",
+  databaseURL: "https://manitto-4cc63-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "manitto-4cc63",
+  storageBucket: "manitto-4cc63.firebasestorage.app",
+  messagingSenderId: "402228599459",
+  appId: "1:402228599459:web:8c3ffaf4a60d9c5f8c3d16"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const TEACHER_PW = 'teacher2025';
+const DAYS = ['mon','tue','wed','thu','fri'];
+const DAY_LABELS = {mon:'월요일',tue:'화요일',wed:'수요일',thu:'목요일',fri:'금요일'};
+
+// 로컬 캐시
+let cache = {roster:[],pairs:{},missions:{},progress:{},revealed:{}};
+let myName = localStorage.getItem('manitto_myname_2026') || null;
+
+function setSyncState(state, text) {
+  document.getElementById('syncDot').className = 'sync-dot ' + state;
+  document.getElementById('syncText').textContent = text;
+}
+
+// Firebase에서 전체 데이터 읽기
+async function loadAll() {
+  setSyncState('syncing','데이터 불러오는 중...');
+  try {
+    const snap = await get(ref(db, 'manitto2026'));
+    if (snap.exists()) {
+      const data = snap.val();
+      cache.roster   = data.roster   || [];
+      cache.pairs    = data.pairs    || {};
+      cache.missions = data.missions || {};
+      cache.progress = data.progress || {};
+      cache.revealed = data.revealed || {};
+    }
+    setSyncState('ok', '실시간 동기화');
+  } catch(e) {
+    setSyncState('error', '연결 오류');
+    console.error(e);
+  }
+}
+
+// Firebase에 특정 경로 저장
+async function saveDB(path, value) {
+  setSyncState('syncing','저장 중...');
+  try {
+    await set(ref(db, 'manitto2026/' + path), value);
+    setSyncState('ok','저장 완료');
+  } catch(e) {
+    setSyncState('error','저장 실패');
+    console.error(e);
+    throw e;
+  }
+}
+
+// 실시간 리스너 (학생 미션 체크 즉시 반영)
+function startRealtime() {
+  onValue(ref(db, 'manitto2026'), (snap) => {
+    if (!snap.exists()) return;
+    const data = snap.val();
+    cache.roster   = data.roster   || [];
+    cache.pairs    = data.pairs    || {};
+    cache.missions = data.missions || {};
+    cache.progress = data.progress || {};
+    cache.revealed = data.revealed || {};
+    setSyncState('ok','실시간 동기화');
+    // 현황 탭이 열려있으면 자동 갱신
+    if (!document.getElementById('tab-status').classList.contains('active')) return;
+    if (!document.getElementById('teacherPanel').classList.contains('hidden')) renderStatus();
+  });
+}
+
+// ── 네비게이션
+window.goHome = function() {
+  document.getElementById('modeSelect').classList.remove('hidden');
+  document.getElementById('teacherPanel').classList.add('hidden');
+  document.getElementById('studentPanel').classList.add('hidden');
+};
+
+window.openTeacher = function() {
+  document.getElementById('pwModal').classList.remove('hidden');
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').style.display = 'none';
+  setTimeout(() => document.getElementById('pwInput').focus(), 100);
+};
+
+window.checkPw = function() {
+  if (document.getElementById('pwInput').value === TEACHER_PW) {
+    closePwModal();
+    document.getElementById('modeSelect').classList.add('hidden');
+    document.getElementById('teacherPanel').classList.remove('hidden');
+    loadTeacherData();
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+  }
+};
+
+window.closePwModal = function() {
+  document.getElementById('pwModal').classList.add('hidden');
+};
+
+window.openStudent = function() {
+  document.getElementById('modeSelect').classList.add('hidden');
+  document.getElementById('studentPanel').classList.remove('hidden');
+  loadStudentPanel();
+};
+
+// ── 탭
+window.switchTab = function(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'status') renderStatus();
+};
+
+// ── 교사 데이터 로드
+function loadTeacherData() {
+  document.getElementById('rosterInput').value = cache.roster.join('\n');
+  const assigned = Object.keys(cache.pairs).length;
+  document.getElementById('rosterStatus').innerHTML =
+    cache.roster.length
+      ? `현재 <strong>${cache.roster.length}명</strong> 등록됨 / 마니또 배정 <strong>${assigned > 0 ? '완료' : '미완료'}</strong>`
+      : '아직 명단이 없습니다.';
+  DAYS.forEach(d => {
+    const el = document.getElementById('mission-' + d);
+    if (el) el.value = cache.missions[d] || '';
+  });
+}
+
+// ── 교사: 명단 저장
+window.saveRoster = async function() {
+  const raw = document.getElementById('rosterInput').value.trim();
+  const names = raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+  if (names.length < 2) { alert('최소 2명 이상 입력해주세요.'); return; }
+  const unique = [...new Set(names)];
+  if (unique.length !== names.length) { alert('중복 이름이 있습니다. 확인해주세요.'); return; }
+  cache.roster = unique;
+  await saveDB('roster', unique);
+  document.getElementById('rosterStatus').innerHTML =
+    `<span style="color:var(--accent);font-weight:bold;">저장 완료!</span> 총 <strong>${unique.length}명</strong> 등록됨`;
+};
+
+// ── 교사: 마니또 배정
+window.assignManitto = async function() {
+  if (cache.roster.length < 2) { alert('먼저 명단을 저장해주세요.'); return; }
+  if (Object.keys(cache.pairs).length > 0) {
+    if (!confirm('이미 마니또가 배정되어 있습니다. 다시 배정할까요?')) return;
+  }
+  const pairs = createDerangement(cache.roster);
+  cache.pairs = pairs;
+  cache.revealed = {};
+  await saveDB('pairs', pairs);
+  await saveDB('revealed', {});
+  document.getElementById('rosterStatus').innerHTML =
+    `<span style="color:var(--accent);font-weight:bold;">마니또 배정 완료!</span> ${cache.roster.length}명 배정됨`;
+  alert(`마니또 배정 완료!\n총 ${cache.roster.length}명에게 마니또가 배정되었습니다.`);
+};
+
+function createDerangement(arr) {
+  const n = arr.length;
+  let shuffled = [...arr], tries = 0;
+  do {
+    for (let i = n-1; i > 0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [shuffled[i],shuffled[j]] = [shuffled[j],shuffled[i]];
+    }
+    tries++;
+  } while (shuffled.some((v,i) => v === arr[i]) && tries < 1000);
+  const pairs = {};
+  arr.forEach((name,i) => { pairs[name] = shuffled[i]; });
+  return pairs;
+}
+
+window.resetManitto = async function() {
+  if (!confirm('마니또 배정을 초기화할까요?')) return;
+  cache.pairs = {}; cache.revealed = {};
+  await saveDB('pairs', {});
+  await saveDB('revealed', {});
+  document.getElementById('rosterStatus').innerHTML = `<span style="color:var(--primary);">마니또 초기화됨</span>`;
+};
+
+// ── 교사: 미션 저장
+window.saveMissions = async function() {
+  const missions = {};
+  DAYS.forEach(d => { missions[d] = document.getElementById('mission-'+d).value.trim(); });
+  cache.missions = missions;
+  await saveDB('missions', missions);
+  document.getElementById('missionStatus').innerHTML = '<span style="color:var(--accent);font-weight:bold;">미션 저장 완료!</span>';
+};
+
+// ── 교사: 달성 현황
+function renderStatus() {
+  const {roster,missions,progress,pairs} = cache;
+  if (roster.length === 0) {
+    document.getElementById('statusContent').innerHTML = '<p style="color:var(--muted);">학생 명단을 먼저 입력해주세요.</p>';
+    return;
+  }
+  let totalChecked = 0, totalPossible = 0;
+  let html = `<p class="section-title">총 <strong>${roster.length}명</strong> / 마니또 배정: <strong>${Object.keys(pairs).length > 0 ? '완료' : '미완료'}</strong></p>`;
+  roster.forEach(name => {
+    const p = progress[name] || {};
+    DAYS.forEach(d => { if (missions[d]) { totalPossible++; if (p[d]) totalChecked++; }});
+  });
+  if (totalPossible > 0) {
+    const pct = Math.round(totalChecked/totalPossible*100);
+    html += `<div class="progress-wrap" style="margin-bottom:16px;"><div class="progress-label"><span>전체 달성률</span><span>${totalChecked}/${totalPossible} (${pct}%)</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div></div>`;
+  }
+  html += `<div style="overflow-x:auto;"><table class="status-table"><thead><tr><th>이름</th><th>마니또</th>${DAYS.map(d=>missions[d]?`<th>${DAY_LABELS[d].slice(0,1)}</th>`:'').join('')}<th>달성</th></tr></thead><tbody>`;
+  roster.forEach(name => {
+    const p = progress[name] || {};
+    const myM = DAYS.filter(d => missions[d]);
+    const done = myM.filter(d => p[d]).length;
+    const total = myM.length;
+    const pct = total > 0 ? Math.round(done/total*100) : 0;
+    html += `<tr><td style="text-align:left;font-weight:bold;">${name}</td><td style="color:var(--primary);">${pairs[name]||'-'}</td>${DAYS.map(d=>missions[d]?`<td><span class="${p[d]?'check-y':'check-n'}">${p[d]?'✓':'○'}</span></td>`:'').join('')}<td><span class="badge ${pct===100?'badge-green':'badge-red'}">${done}/${total}</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${pct}%"></div></div></td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById('statusContent').innerHTML = html;
+}
+window.renderStatus = renderStatus;
+
+window.resetAllProgress = async function() {
+  if (!confirm('모든 학생의 달성 기록을 초기화할까요?')) return;
+  cache.progress = {};
+  await saveDB('progress', {});
+  renderStatus();
+};
+
+// ── 학생 패널
+function loadStudentPanel() {
+  if (myName && cache.pairs[myName]) {
+    showStudentMain(myName);
+  } else {
+    renderNameGrid();
+    document.getElementById('nameSelectSection').classList.remove('hidden');
+    document.getElementById('studentMain').classList.add('hidden');
+  }
+}
+
+let _selectedName = null;
+
+function renderNameGrid() {
+  const {roster,pairs} = cache;
+  const grid = document.getElementById('nameGrid');
+  if (roster.length === 0) {
+    grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;">아직 교사가 명단을 입력하지 않았습니다.</p>';
+    return;
+  }
+  grid.innerHTML = roster.map(name =>
+    `<div class="student-chip ${pairs[name]?'assigned':''}" onclick="selectName('${name}',this)">${name}</div>`
+  ).join('');
+}
+
+window.selectName = function(name, el) {
+  _selectedName = name;
+  document.querySelectorAll('.student-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('selectedNameDisplay').textContent = `선택된 이름: ${name}`;
+};
+
+window.confirmStudent = function() {
+  if (!_selectedName) { alert('이름을 선택해주세요.'); return; }
+  if (!cache.pairs[_selectedName]) {
+    alert('아직 마니또 배정이 완료되지 않았습니다. 교사에게 문의해주세요.');
+    return;
+  }
+  if (confirm(`"${_selectedName}" 로 접속하시겠습니까?\n한번 설정하면 이 기기에서는 변경되지 않습니다.`)) {
+    myName = _selectedName;
+    localStorage.setItem('manitto_myname_2026', _selectedName);
+    showStudentMain(_selectedName);
+  }
+};
+
+function showStudentMain(name) {
+  document.getElementById('nameSelectSection').classList.add('hidden');
+  document.getElementById('studentMain').classList.remove('hidden');
+  document.getElementById('studentGreeting').innerHTML =
+    `<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="7" fill="#4d96ff"/><circle cx="11" cy="9" r="3.5" fill="white" fill-opacity=".95"/><path d="M4 20c0-3.9 3.1-6 7-6s7 2.1 7 6" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    ${name}의 마니또 페이지`;
+
+  if (cache.revealed[name] && cache.pairs[name]) {
+    document.getElementById('manittoRevealArea').classList.add('hidden');
+    document.getElementById('manittoShown').classList.remove('hidden');
+    document.getElementById('manittoNameDisplay').textContent = cache.pairs[name];
+  } else {
+    document.getElementById('manittoRevealArea').classList.remove('hidden');
+    document.getElementById('manittoShown').classList.add('hidden');
+  }
+  renderStudentMissions(name);
+}
+
+window.revealManitto = async function() {
+  const manitto = cache.pairs[myName];
+  if (!manitto) { alert('마니또가 아직 배정되지 않았습니다.'); return; }
+  cache.revealed[myName] = true;
+  await saveDB('revealed/' + myName, true);
+  document.getElementById('manittoRevealArea').classList.add('hidden');
+  document.getElementById('manittoShown').classList.remove('hidden');
+  document.getElementById('manittoNameDisplay').textContent = manitto;
+};
+
+function renderStudentMissions(name) {
+  const {missions,progress} = cache;
+  const myProgress = progress[name] || {};
+  const today = new Date().getDay();
+  const todayMap = {1:'mon',2:'tue',3:'wed',4:'thu',5:'fri'};
+  const todayKey = todayMap[today] || null;
+  let html = '', hasAny = false, doneCount = 0, missionCount = 0;
+  DAYS.forEach(d => {
+    if (!missions[d]) return;
+    hasAny = true; missionCount++;
+    const done = !!myProgress[d];
+    if (done) doneCount++;
+    const isToday = d === todayKey;
+    html += `<div class="mission-item ${done?'done':''} ${isToday&&!done?'today':''}" onclick="toggleMission('${name}','${d}')">
+      <div class="check-circle">${done?'✓':''}</div>
+      <span class="mission-day-tag">${DAY_LABELS[d]}</span>
+      <span class="mission-text">${missions[d]}</span>
+    </div>`;
+  });
+  if (!hasAny) html = '<p style="color:var(--muted);font-size:.95rem;padding:12px 0;">아직 교사가 미션을 입력하지 않았습니다.</p>';
+  document.getElementById('studentMissionList').innerHTML = html;
+  updateProgress(doneCount, missionCount);
+}
+
+window.toggleMission = async function(name, day) {
+  if (!cache.progress[name]) cache.progress[name] = {};
+  cache.progress[name][day] = !cache.progress[name][day];
+  await saveDB(`progress/${name}/${day}`, cache.progress[name][day]);
+  renderStudentMissions(name);
+};
+
+function updateProgress(done, total) {
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  document.getElementById('progressLabel').textContent = `${done} / ${total}`;
+  document.getElementById('progressBarFill').style.width = pct + '%';
+}
+
+// ── 초기화
+(async () => {
+  await loadAll();
+  startRealtime();
+  document.getElementById('loadingOverlay').classList.add('hidden');
+})();
+
+</script>
+</body>
+</html>
